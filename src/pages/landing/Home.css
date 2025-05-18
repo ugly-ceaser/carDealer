@@ -1,0 +1,14 @@
+.hero {
+    height: 80vh;
+}
+
+.slide-1 {
+    background: url("../../assets/images/banner/s-class.jpg");
+}
+.slide-2 {
+    background: url("../../assets/images/banner/amg-gt.jpg");
+}
+    
+.slide-3 {
+    background: url("../../assets/images/banner/eq-electric.jpg");
+}
