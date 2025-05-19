@@ -59,7 +59,7 @@ const login = async (req, res, next) => {
 // Register
 const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, admin } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -82,7 +82,7 @@ const register = async (req, res, next) => {
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    await create(table, { name, email, password: hashedPassword });
+    await create(table, { name, email, admin, password: hashedPassword });
 
     res.status(201).json({
       success: true,
