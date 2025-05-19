@@ -9,7 +9,15 @@ const {
   changePassword,
 } = require("../controllers/user");
 const { authorize, isAdmin } = require("../middleware/authorize");
-const { addProduct } = require("../controllers/product");
+const {
+  addProduct,
+  fetchProductById,
+  fetchFeaturedProducts,
+  fetchAllProducts,
+  deleteProduct,
+  searchProducts,
+  updateProduct,
+} = require("../controllers/product");
 const { uploadImage } = require("../utils/image");
 
 //user routes
@@ -22,5 +30,11 @@ router.put("/user/change-password", authorize, changePassword);
 
 //product routes
 router.post("/product", authorize, isAdmin, uploadImage, addProduct);
+router.get("/product", authorize, fetchAllProducts);
+router.put("/product/:id", authorize, isAdmin, uploadImage, updateProduct);
+router.get("/product/:id", authorize, fetchProductById);
+router.delete("/product/:id", authorize, isAdmin, deleteProduct);
+router.get("/product/search", authorize, searchProducts);
+router.get("/product/featured", authorize, fetchFeaturedProducts);
 
 module.exports = router;

@@ -1,7 +1,11 @@
 import { ShoppingCart } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useSearch } from '../../context/SearchContext';
+import { Search } from 'lucide-react';
 
 export default function UserHeader() {
+
+    const { setShowSearch } = useSearch();
 
     const handleLogout = (e) => {
         return
@@ -27,16 +31,19 @@ export default function UserHeader() {
                     </ul>
                     <ul className="navbar-nav">
                         <li className="nav-item">
+                            <Link to="/user/cart" className="nav-link" aria-current="page">
+                                <ShoppingCart />
+                            </Link>
+                        </li>
+                        <li className="nav-item">
                             <Link to="#" className="nav-link">Hello, John Doe</Link>
                         </li>
                         <li className="nav-item">
                             <Link to="/user/profile" className="nav-link" aria-current="page">Profile</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link to="/user/cart" className="nav-link" aria-current="page">
-                                <ShoppingCart />
-                            </Link>
-                        </li>
+                        <button id="search-toggle" class="btn btn-outline-light border-0 ms-3" onClick={() => setShowSearch(true)}>
+                            <Search />
+                        </button>
                         <li className="nav-item">
                             <Link to="#" onClick={handleLogout} className="nav-link" aria-disabled="true">Logout</Link>
                         </li>
