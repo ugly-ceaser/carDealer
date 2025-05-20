@@ -1,6 +1,8 @@
-import {Link} from "react-router-dom";
-import {Swiper, SwiperSlide} from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import Login from "../../component/LoginSection";
+import FeaturedProducts from "../../component/FeaturedProducts";
+import { useState, useEffect } from "react";
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -8,9 +10,6 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
 import './Home.css'
-import Login from "../../component/landing/LoginSection";
-
-import productImage from '../../assets/images/products/1.jpg';
 
 const HeroCarouselSection = () => {
     const slides = [
@@ -57,61 +56,25 @@ const HeroCarouselSection = () => {
 }
 
 export default function HomePage() {
-
-    const Products = [
-        {
-            id: 1,
-            name: 'Mercedes-Benz S-Class',
-            description: 'The epitome of luxury and comfort with advanced technology',
-            price: 110000,
-            image: '1.JPG'
-        },
-        {
-            id: 2,
-            name: 'Mercedes-Benz GLE SUV',
-            description: 'Versatile luxury SUV with spacious interior and powerful performance',
-            price: 85000,
-            image: '2.jpg'
-        },
-        {
-            id: 3,
-            name: 'Mercedes-Benz EQS',
-            description: 'All-electric luxury sedan with impressive range and technology',
-            price: 125000,
-            image: '4.jpg'
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    useEffect(() => {
+        // Check for the presence of a token in localStorage on component mount
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
         }
-    ]
+    }, []);
     return (
         <>
-            <HeroCarouselSection/>
+            <HeroCarouselSection />
 
-            <section className="py-5 bg-light">
-                <div className="container">
-                    <h2 className="text-center mb-5">Featured Models</h2>
-                    <div className="row g-4">
-                        {Products.map((product, index) => (
-                            <div className="col-md-6 col-lg-4" key={index}>
-                                <div className="card h-100 shadow-sm hover-card">
-                                    <img src={productImage} className="card-img-top" alt="Mercedes-Benz S-Class" />
-                                    <div className="card-body">
-                                        <h3 className="card-title">{product.name}</h3>
-                                        <p className="card-text text-muted">{product.description}</p>
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <span className="fs-5 fw-bold">${product.price}</span>
-                                            <Link to={`catalog/${product.id}`} className="btn btn-primary">View Details</Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="text-center mt-5">
-                        <Link to='' href="catalog.html" className="btn btn-primary btn-lg">View All Models</Link>
-                    </div>
-                </div>
-            </section>
+            {isAuthenticated && (
+                <FeaturedProducts />
+            )}
 
-            <Login/>
+            <Login />
 
             <section className="py-5 bg-dark text-white">
                 <div className="container">

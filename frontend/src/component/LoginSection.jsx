@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import usersApi from "../api/userApi"; // Import the users API
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -7,6 +9,9 @@ const Login = () => {
         password: "",
         rememberMe: false,
     });
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -16,10 +21,27 @@ const Login = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle login logic here
-        console.log(formData);
+        setLoading(true);
+        setError("");
+
+        try {
+            const response = await usersApi.login({
+                email: formData.email,
+                password: formData.password,
+            });
+
+            // Handle successful login
+            console.log("Login successful:", response);
+            localStorage.setItem("token", response.data.token);
+            navigate("/user/dashboard");
+        } catch (err) {
+            setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+            console.error("Login error:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -30,6 +52,7 @@ const Login = () => {
                         <h2 className="text-center mb-4">Login to Your Account</h2>
                         <div className="card shadow">
                             <div className="card-body p-4">
+                                {error && <div className="alert alert-danger">{error}</div>}
                                 <form onSubmit={handleSubmit}>
                                     <div className="mb-3">
                                         <label htmlFor="email" className="form-label">
@@ -81,8 +104,8 @@ const Login = () => {
                                         </label>
                                     </div>
 
-                                    <button type="submit" className="btn btn-primary w-100">
-                                        Login
+                                    <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                                        {loading ? "Logging in..." : "Login"}
                                     </button>
 
                                     <div className="text-center mt-3">

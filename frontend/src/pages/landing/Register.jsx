@@ -1,4 +1,6 @@
 import { useState } from "react";
+import usersApi from "../../api/userApi"; // Import the users API
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const RegistrationForm = () => {
     const [formData, setFormData] = useState({
@@ -10,14 +12,15 @@ const RegistrationForm = () => {
         password: "",
         confirmPassword: "",
     });
-
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false); // Add loading state
+    const navigate = useNavigate(); // Initialize useNavigate
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => { // Make handleSubmit async
         e.preventDefault();
         // Simple validation
         const newErrors = {};
@@ -33,8 +36,36 @@ const RegistrationForm = () => {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            console.log("Form submitted", formData);
-            // Handle API call here
+            setLoading(true); // Set loading to true before API call
+            try {
+                // Prepare the data for the API.  Adapt to your API's expected structure
+                const userData = {
+                    name: `${formData.firstName} ${formData.lastName}`, // Combine first and last names
+                    email: formData.email,
+                    password: formData.password,
+                    phone: formData.phone, // Include phone number
+                    admin: formData.userRole === 'dealer', // Convert userRole to boolean 'admin'
+                };
+
+                // Call the register API function
+                const response = await usersApi.register(userData);
+
+                console.log("Registration successful:", response);
+                // Handle successful registration (e.g., show a success message, redirect)
+                navigate('/login'); // Redirect to login after successful registration
+
+            } catch (error) {
+                console.error("Registration error:", error);
+                // Handle registration error (e.g., display error message to the user)
+                if (error.response && error.response.data) {
+                    setErrors({ api: error.response.data.message }); // Set a general error message
+                } else {
+                    setErrors({ api: "An error occurred during registration." });
+                }
+
+            } finally {
+                setLoading(false); // Set loading to false after API call, regardless of result
+            }
         }
     };
 
@@ -52,6 +83,8 @@ const RegistrationForm = () => {
                             </div>
                             <div className="card-body p-4">
                                 <form onSubmit={handleSubmit} noValidate>
+                                    {errors.api && <div className="alert alert-danger">{errors.api}</div>}
+
                                     <div className="row mb-3">
                                         <div className="col-md-6 mb-3 mb-md-0">
                                             <label className="form-label">First Name</label>
@@ -152,14 +185,14 @@ const RegistrationForm = () => {
                                         </div>
                                     </div>
 
-                                    <button type="submit" className="btn btn-secondary w-100">
-                                        Create account
+                                    <button type="submit" className="btn btn-secondary w-100" disabled={loading}>
+                                        {loading ? 'Creating Account...' : 'Create account'}
                                     </button>
 
                                     <div className="text-center mt-3">
                                         <p className="mb-0">
                                             Already have an account?{" "}
-                                            <a href="./user/index.html">Sign in</a>
+                                            <a href="./login">Sign in</a>  {/* Corrected link */}
                                         </p>
                                     </div>
                                 </form>

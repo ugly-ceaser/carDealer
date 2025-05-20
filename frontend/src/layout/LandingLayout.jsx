@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
-import LandingHeader from "../component/landing/Header.jsx";
-import LandingFooter from "../component/landing/Footer.jsx";
+import Header from "../component/Header.jsx";
+import Footer from "../component/Footer.jsx";
 import { SearchProvider } from '../context/SearchContext.jsx';
 import { CartProvider } from '../context/CartContext.jsx';
 import CartSidebar from '../component/CartSidebar.jsx';
@@ -10,10 +10,10 @@ export default function LandingLayout() {
         <>
             <SearchProvider>
                 <CartProvider>
-                    <LandingHeader />
+                    <Header />
                     <CartSidebar />
                     <Outlet />
-                    <LandingFooter />
+                    <Footer />
                 </CartProvider>
             </SearchProvider>
         </>
