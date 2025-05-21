@@ -7,8 +7,8 @@ const {
   remove,
   search,
   fetchByMultipleColumns,
-} = require("../utils/helpers");
-const table = "products";
+} = require('../utils/helpers');
+const table = 'products';
 
 //add new car
 const addProduct = async (req, res, next) => {
@@ -30,7 +30,7 @@ const addProduct = async (req, res, next) => {
     if (!name || !brand || !model || !year || !price) {
       return res
         .status(400)
-        .json({ success: false, message: "All fields are required" });
+        .json({ success: false, message: 'All fields are required' });
     }
 
     const data = {
@@ -52,7 +52,7 @@ const addProduct = async (req, res, next) => {
     if (!result) {
       return res
         .status(500)
-        .json({ success: false, message: "Failed to add product" });
+        .json({ success: false, message: 'Failed to add product' });
     }
     // Fetch the newly created product
     const newProduct = await fetchById(table, result.insertId);
@@ -60,7 +60,7 @@ const addProduct = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: "Product added successfully",
+      message: 'Product added successfully',
       data: {
         product: newProduct[0],
       },
@@ -73,11 +73,11 @@ const addProduct = async (req, res, next) => {
 // fetch featured products
 const fetchFeaturedProducts = async (req, res) => {
   try {
-    const products = await fetchByColumn(table, "featured", 1);
+    const products = await fetchByColumn(table, 'featured', 1);
     if (products.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No featured products found",
+        message: 'No featured products found',
       });
     }
     products.forEach((product) => {
@@ -101,7 +101,7 @@ const fetchAllProducts = async (req, res) => {
     if (products.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No products found",
+        message: 'No products found',
       });
     }
     products.forEach((product) => {
@@ -126,7 +126,7 @@ const fetchProductById = async (req, res) => {
     if (product.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: 'Product not found',
       });
     }
     product[0].featured = product[0].featured === 1 ? true : false;
@@ -178,7 +178,7 @@ const updateProduct = async (req, res) => {
     if (!result) {
       return res
         .status(500)
-        .json({ success: false, message: "Failed to update product" });
+        .json({ success: false, message: 'Failed to update product' });
     }
     // Fetch the updated product
     const updatedProduct = await fetchById(table, productId);
@@ -187,7 +187,7 @@ const updateProduct = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Product updated successfully",
+      message: 'Product updated successfully',
       data: {
         product: updatedProduct[0],
       },
@@ -205,11 +205,11 @@ const deleteProduct = async (req, res) => {
     if (!result) {
       return res
         .status(500)
-        .json({ success: false, message: "Failed to delete product" });
+        .json({ success: false, message: 'Failed to delete product' });
     }
     res.status(200).json({
       success: true,
-      message: "Product deleted successfully",
+      message: 'Product deleted successfully',
     });
   } catch (err) {
     next(err);
@@ -223,16 +223,11 @@ const searchProducts = async (req, res) => {
     if (!query) {
       return res.status(400).json({
         success: false,
-        message: "Query parameter is required",
+        message: 'Query parameter is required',
       });
     }
-    const products = await search(table, "name", query);
-    if (products.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No products found",
-      });
-    }
+    const products = await search(table, 'name', query);
+
     products.forEach((product) => {
       product.featured = product.featured === 1 ? true : false;
     });
@@ -262,7 +257,7 @@ const filterProducts = async (req, res) => {
     if (products.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No products found",
+        message: 'No products found',
       });
     }
     products.forEach((product) => {

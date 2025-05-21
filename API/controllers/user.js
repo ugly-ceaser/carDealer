@@ -1,8 +1,8 @@
-const { fetchByColumn, create, update } = require("../utils/helpers");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const { fetchByColumn, create, update } = require('../utils/helpers');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const table = "users";
+const table = 'users';
 
 // Login
 const login = async (req, res, next) => {
@@ -12,18 +12,18 @@ const login = async (req, res, next) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Email and password are required" });
+        .json({ success: false, message: 'Email and password are required' });
     }
 
-    if (!email.includes("@")) {
+    if (!email.includes('@')) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid email format" });
+        .json({ success: false, message: 'Invalid email format' });
     }
 
-    const results = await fetchByColumn(table, "email", email);
+    const results = await fetchByColumn(table, 'email', email);
     if (results.length === 0) {
-      return res.status(401).json({ success: false, message: "Invalid email" });
+      return res.status(401).json({ success: false, message: 'Invalid email' });
     }
 
     const user = results[0];
@@ -31,17 +31,21 @@ const login = async (req, res, next) => {
     if (!isPasswordValid) {
       return res
         .status(401)
-        .json({ success: false, message: "Invalid password" });
+        .json({ success: false, message: 'Invalid password' });
     }
 
     // Generate JWT token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { id: user.id, name: user.name, email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1h',
+      }
+    );
 
     res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: 'Login successful',
       data: {
         user: {
           id: user.id,
@@ -59,34 +63,34 @@ const login = async (req, res, next) => {
 // Register
 const register = async (req, res, next) => {
   try {
-    const { name, email, password, admin } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Name, email, and password are required",
+        message: 'Name, email, and password are required',
       });
     }
 
-    if (!email.includes("@")) {
+    if (!email.includes('@')) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid email format" });
+        .json({ success: false, message: 'Invalid email format' });
     }
 
-    const existingUsers = await fetchByColumn(table, "email", email);
+    const existingUsers = await fetchByColumn(table, 'email', email);
     if (existingUsers.length > 0) {
       return res
         .status(409)
-        .json({ success: false, message: "Email already exists" });
+        .json({ success: false, message: 'Email already exists' });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    await create(table, { name, email, admin, password: hashedPassword });
+    await create(table, { name, email, password: hashedPassword });
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: 'User registered successfully',
     });
   } catch (err) {
     next(err);
@@ -114,15 +118,15 @@ const getUserProfileById = async (req, res, next) => {
     if (!userId) {
       return res.status(400).json({
         success: false,
-        message: "User ID is required",
+        message: 'User ID is required',
       });
     }
 
-    const results = await fetchByColumn(table, "id", userId);
+    const results = await fetchByColumn(table, 'id', userId);
     if (results.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: 'User not found' });
     }
 
     const user = results[0];
@@ -148,27 +152,27 @@ const updateUserProfile = async (req, res, next) => {
     if (!name || !email) {
       return res
         .status(400)
-        .json({ success: false, message: "Name and email are required" });
+        .json({ success: false, message: 'Name and email are required' });
     }
 
-    if (!email.includes("@")) {
+    if (!email.includes('@')) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid email format" });
+        .json({ success: false, message: 'Invalid email format' });
     }
 
     await update(table, userId, { name, email });
 
-    const updatedUser = await fetchByColumn(table, "id", userId);
+    const updatedUser = await fetchByColumn(table, 'id', userId);
     if (updatedUser.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: 'User not found' });
     }
 
     res.status(200).json({
       success: true,
-      message: "User profile updated successfully",
+      message: 'User profile updated successfully',
       data: {
         user: {
           id: updatedUser[0].id,
@@ -191,15 +195,15 @@ const changePassword = async (req, res, next) => {
     if (!oldPassword || !newPassword) {
       return res.status(400).json({
         success: false,
-        message: "Old password and new password are required",
+        message: 'Old password and new password are required',
       });
     }
 
-    const results = await fetchByColumn(table, "id", userId);
+    const results = await fetchByColumn(table, 'id', userId);
     if (results.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "User not found" });
+        .json({ success: false, message: 'User not found' });
     }
 
     const user = results[0];
@@ -207,7 +211,7 @@ const changePassword = async (req, res, next) => {
     if (!isOldPasswordValid) {
       return res
         .status(401)
-        .json({ success: false, message: "Incorrect old password" });
+        .json({ success: false, message: 'Incorrect old password' });
     }
 
     const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
@@ -215,7 +219,7 @@ const changePassword = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Password changed successfully",
+      message: 'Password changed successfully',
     });
   } catch (err) {
     next(err);

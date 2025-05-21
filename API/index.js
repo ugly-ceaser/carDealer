@@ -4,23 +4,16 @@ require('dotenv').config();
 const { ensureDatabaseExists, dbConfig, query } = require('./config/db');
 const { createTablesSQL } = require('./config/initDb');
 const cors = require('cors');
+const seedProducts = require('./config/seedProducts');
 
 const app = express();
-
-// Allow CORS for React frontend
-app.use(
-  cors({
-    origin: 'http://localhost:5173', // Adjust if your React dev server runs elsewhere
-    credentials: true,
-  })
-);
 
 // Body parsing middleware
 app.use(express.urlencoded({ extended: true })); // For form submissions
 app.use(express.json()); // For JSON payloads
 app.use(
   cors({
-    origin: 'http://localhost:5174', // Or your actual frontend domain
+    origin: 'http://localhost:5173', // Or your actual frontend domain
   })
 );
 
@@ -34,13 +27,26 @@ app.use('/api', apiRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack); // Log the error stack for debugging
-  res.status(err.status || 500).json({
+
+  // Default status code and message
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Something went wrong on the server.';
+
+  // Specific JWT errors
+  if (err.name === 'JsonWebTokenError') {
+    statusCode = 401;
+    message = 'Invalid token.';
+  } else if (err.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Token expired. Please log in again.';
+  }
+
+  // Set the status and send the JSON response
+  res.status(statusCode).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-    error: {
-      message: err.message,
-      status: err.status || 500,
-    },
+    message: message,
+    // Optionally, you might want to send the error details only in development
+    // error: process.env.NODE_ENV === 'development' ? err : {}
   });
 });
 
@@ -55,6 +61,55 @@ async function startServer() {
       await query(sql);
     }
     console.log('Tables checked/created.');
+
+    // Seeded the product here
+    const rows = await query('SELECT COUNT(*) AS count FROM products');
+    const productCount = rows[0].count;
+
+    if (productCount === 0) {
+      console.log('Products table is empty. Seeding with initial data...');
+      for (const product of seedProducts) {
+        const {
+          name,
+          brand,
+          model,
+          year,
+          price,
+          color,
+          mileage,
+          transmission,
+          fuel_type,
+          description,
+          image_url,
+          featured,
+        } = product;
+        const insertSql = `
+                    INSERT INTO products (name, brand, model, year, price, color, mileage, transmission, fuel_type, description, image_url, featured)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `;
+        const params = [
+          name,
+          brand,
+          model,
+          year,
+          price,
+          color,
+          mileage,
+          transmission,
+          fuel_type,
+          description,
+          image_url,
+          featured,
+        ];
+        await query(insertSql, params);
+      }
+      console.log('Products table seeded successfully.');
+    } else {
+      console.log(
+        `Products table already contains ${productCount} items. Skipping seeding.`
+      );
+    }
+
     const PORT = 2500;
     app.listen(PORT, () => {
       console.log(`Express app running at http://localhost:${PORT}`);
