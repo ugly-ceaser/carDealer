@@ -74,7 +74,10 @@ export default function HomePage() {
                 <FeaturedProducts />
             )}
 
-            <Login />
+            {!isAuthenticated && (
+                <Login />
+            )}
+
 
             <section className="py-5 bg-dark text-white">
                 <div className="container">

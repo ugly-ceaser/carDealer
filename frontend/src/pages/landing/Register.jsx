@@ -1,20 +1,17 @@
 import { useState } from "react";
 import usersApi from "../../api/userApi"; // Import the users API
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const RegistrationForm = () => {
     const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
+        name: "",
         email: "",
-        phone: "",
-        userRole: "customer",
         password: "",
         confirmPassword: "",
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false); // Add loading state
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,10 +21,8 @@ const RegistrationForm = () => {
         e.preventDefault();
         // Simple validation
         const newErrors = {};
-        if (!formData.firstName) newErrors.firstName = "First name is required";
-        if (!formData.lastName) newErrors.lastName = "Last name is required";
+        if (!formData.name) newErrors.name = "Full Name is required";
         if (!formData.email) newErrors.email = "Valid email is required";
-        if (!formData.phone) newErrors.phone = "Valid phone is required";
         if (!formData.password || formData.password.length < 8)
             newErrors.password = "Password must be at least 8 characters";
         if (formData.password !== formData.confirmPassword)
@@ -40,11 +35,9 @@ const RegistrationForm = () => {
             try {
                 // Prepare the data for the API.  Adapt to your API's expected structure
                 const userData = {
-                    name: `${formData.firstName} ${formData.lastName}`, // Combine first and last names
+                    name: formData.name,
                     email: formData.email,
                     password: formData.password,
-                    phone: formData.phone, // Include phone number
-                    admin: formData.userRole === 'dealer', // Convert userRole to boolean 'admin'
                 };
 
                 // Call the register API function
@@ -52,7 +45,7 @@ const RegistrationForm = () => {
 
                 console.log("Registration successful:", response);
                 // Handle successful registration (e.g., show a success message, redirect)
-                navigate('/login'); // Redirect to login after successful registration
+                navigate('/');
 
             } catch (error) {
                 console.error("Registration error:", error);
@@ -85,35 +78,19 @@ const RegistrationForm = () => {
                                 <form onSubmit={handleSubmit} noValidate>
                                     {errors.api && <div className="alert alert-danger">{errors.api}</div>}
 
-                                    <div className="row mb-3">
-                                        <div className="col-md-6 mb-3 mb-md-0">
-                                            <label className="form-label">First Name</label>
-                                            <input
-                                                type="text"
-                                                className={`form-control ${errors.firstName && "is-invalid"}`}
-                                                name="firstName"
-                                                placeholder="John"
-                                                value={formData.firstName}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                            <div className="invalid-feedback">{errors.firstName}</div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">Last Name</label>
-                                            <input
-                                                type="text"
-                                                className={`form-control ${errors.lastName && "is-invalid"}`}
-                                                name="lastName"
-                                                placeholder="Doe"
-                                                value={formData.lastName}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                            <div className="invalid-feedback">{errors.lastName}</div>
-                                        </div>
+                                    <div className="mb-3">
+                                        <label className="form-label">Name</label>
+                                        <input
+                                            type="text"
+                                            className={`form-control ${errors.name && "is-invalid"}`}
+                                            name="name"
+                                            placeholder="john.doe@example.com"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                        <div className="invalid-feedback">{errors.name}</div>
                                     </div>
-
                                     <div className="mb-3">
                                         <label className="form-label">Email</label>
                                         <input
@@ -126,34 +103,6 @@ const RegistrationForm = () => {
                                             required
                                         />
                                         <div className="invalid-feedback">{errors.email}</div>
-                                    </div>
-
-                                    <div className="mb-3">
-                                        <label className="form-label">Phone Number</label>
-                                        <input
-                                            type="tel"
-                                            className={`form-control ${errors.phone && "is-invalid"}`}
-                                            name="phone"
-                                            placeholder="(123) 456-7890"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                        <div className="invalid-feedback">{errors.phone}</div>
-                                    </div>
-
-                                    <div className="mb-3">
-                                        <label className="form-label">I am a</label>
-                                        <select
-                                            className="form-select"
-                                            name="userRole"
-                                            value={formData.userRole}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value="customer">Customer</option>
-                                            <option value="dealer">Dealer</option>
-                                        </select>
                                     </div>
 
                                     <div className="row mb-3">
@@ -192,7 +141,7 @@ const RegistrationForm = () => {
                                     <div className="text-center mt-3">
                                         <p className="mb-0">
                                             Already have an account?{" "}
-                                            <a href="./login">Sign in</a>  {/* Corrected link */}
+                                            <Link to="/">Sign in</Link>  {/* Corrected link */}
                                         </p>
                                     </div>
                                 </form>

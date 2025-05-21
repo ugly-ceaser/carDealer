@@ -65,11 +65,11 @@ const Catalog = () => {
 
     const handleNameSearch = async (e) => {
         setName(e.target.value);
-        if (e.target.value.trim()) {
+        if (e.target.value) {
             setLoading(true);
             setError(null);
             try {
-                const response = await productsApi.searchProducts(e.target.value.trim());
+                const response = await productsApi.searchProducts(e.target.value);
                 setFilteredProducts(response.data.products);
             } catch (err) {
                 setError(err.message || 'Failed to search products');
@@ -97,11 +97,21 @@ const Catalog = () => {
     };
 
     if (loading) {
-        return <p>Loading products...</p>;
+        return (
+            <section className="py-5">
+                <div className="container">
+                    <p>Loading products...</p>
+                </div>
+            </section>);
     }
 
     if (error) {
-        return <p>Error loading products: {error}</p>;
+        return (
+            <section className="py-5">
+                <div className="container">
+                    <p>No produts to display</p>
+                </div>
+            </section>);
     }
 
     return (
@@ -118,6 +128,7 @@ const Catalog = () => {
                 </div>
 
                 <form id="search-form" onSubmit={handleSearch} className='p-3'>
+                    <label className="form-label mt-3">Name</label>
                     <input
                         type="text"
                         className="form-control"
@@ -237,7 +248,7 @@ const Catalog = () => {
                                             {/* You can display more product details here */}
                                         </ul>
                                         <div className="d-flex justify-content-between align-items-center">
-                                            <Link to={`/catalog/${product.id}`} className="btn btn-primary">View Details</Link>
+                                            <Link to={`${product.id}`} className="btn btn-primary">View Details</Link>
                                             <button className="btn btn-success">Add to Cart</button>
                                         </div>
                                     </div>

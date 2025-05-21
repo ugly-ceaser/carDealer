@@ -10,13 +10,9 @@ import AuthGuard from "../component/AuthGuard.jsx";
 export default function UserRoutes() {
     return (
         <Routes>
-            <Route
-                element={
-                    <AuthGuard>
-                        <UserLayout />
-                    </AuthGuard>
-                }
-            >
+            <Route element={<AuthGuard>
+                <UserLayout />
+            </AuthGuard>}>
                 <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="catalog" element={<Catalog />} />
                 <Route path="catalog/:id" element={<CatalogDetail />} />

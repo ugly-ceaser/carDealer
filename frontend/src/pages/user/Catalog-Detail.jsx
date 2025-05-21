@@ -1,54 +1,48 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import productImage from '../../assets/images/products/1.jpg';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import productsApi from '../../api/productApi'; // Import your productsApi
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext'; // Import useAuth for logout on 401
 
 const CatalogDetail = () => {
-    const { productId } = useParams();
-    const [product] = useState({
-        id: 1,
-        name: 'Mercedes-Benz S-Class',
-        price: '€120,000',
-        description: 'Luxury at its finest. The Mercedes-Benz S-Class offers an unparalleled driving experience, combining cutting-edge technology, comfort, and performance.',
-        images: [
-            productImage,
-            productImage
-        ],
-        features: [
-            'Premium Leather Upholstery',
-            '500+ Horsepower Engine',
-            'Advanced Navigation System',
-            'Safety Assist Technologies'
-        ],
-        specs: {
-            engine: '4.0L V8 Bi-Turbo',
-            horsepower: '523 hp',
-            torque: '516 lb-ft',
-            transmission: '9-Speed Automatic',
-            fuelEconomy: '21 MPG City / 28 MPG Highway'
-        }
-    });
-    const [activeIndex, setActiveIndex] = useState(0);
-    const { addToCart } = useCart()
-
+    const { id } = useParams();
+    const [product, setProduct] = useState(null); // Initialize product state as null
+    const [activeIndex, setActiveIndex] = useState(0); // For carousel
+    const { addToCart } = useCart();
+    const { logout } = useAuth(); // Get logout from AuthContext
 
     useEffect(() => {
-        // Replace with your real API or local JSON logic
-        fetch(`/api/products/${productId}`)
-            .then((res) => res.json())
-            .then((data) => setProduct(data))
-            .catch((err) => console.error('Failed to fetch product:', err));
-    }, [productId]);
+        const getProductDetails = async () => {
+            try {
+                const response = await productsApi.fetchProductById(id);
+                // Assuming response.data.product contains the product object
+                setProduct(response.data.product);
+            } catch (error) {
+                console.error('Failed to fetch product:', error);
+                if (error.response && error.response.status === 401) {
+                    alert('Your session has expired. Please log in again.');
+                    logout(); // Redirect to login
+                } else {
+                    alert(`Failed to load product details: ${error.response?.data?.message || error.message}`);
+                }
+            }
+        };
+
+        getProductDetails();
+    }, [id, logout]); // Add logout to dependency array
 
     const handleAddToCart = () => {
-        addToCart({
-            id: product.id,
-            name: product.name,
-            price: 120000, // Use actual numeric price
-            images: product.images
-        });
-
+        if (product) {
+            addToCart({
+                id: product.id,
+                name: product.name,
+                price: product.price, // Use actual numeric price from fetched product
+                // Assuming image_url is a single string from the backend
+                // If you want multiple images, your backend/DB schema needs to support it
+                image_url: product.image_url
+            });
+            alert(`${product.name} added to cart!`);
+        }
     };
 
     if (!product) {
@@ -61,47 +55,18 @@ const CatalogDetail = () => {
         );
     }
 
+
     return (
         <section className="py-5">
             <div className="container">
                 <div className="row">
                     <div className="col-md-6">
-                        <div id="product-carousel" className="carousel slide" data-bs-ride="carousel">
-                            <div className="carousel-inner">
-                                {product.images.map((img, index) => (
-                                    <div
-                                        key={index}
-                                        className={`carousel-item ${index === activeIndex ? 'active' : ''}`}
-                                    >
-                                        <img
-                                            src={img}
-                                            className="d-block w-100"
-                                            alt={`${product.name} ${index + 1}`}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                className="carousel-control-prev"
-                                type="button"
-                                data-bs-target="#product-carousel"
-                                data-bs-slide="prev"
-                                onClick={() => setActiveIndex(prev => (prev > 0 ? prev - 1 : product.images.length - 1))}
-                            >
-                                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span className="visually-hidden">Previous</span>
-                            </button>
-                            <button
-                                className="carousel-control-next"
-                                type="button"
-                                data-bs-target="#product-carousel"
-                                data-bs-slide="next"
-                                onClick={() => setActiveIndex(prev => (prev < product.images.length - 1 ? prev + 1 : 0))}
-                            >
-                                <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span className="visually-hidden">Next</span>
-                            </button>
-                        </div>
+
+                        <img
+                            src={product.image_url}
+                            className="d-block w-100"
+                            alt="No Image Available"
+                        />
                     </div>
 
                     <div className="col-md-6">
@@ -109,7 +74,7 @@ const CatalogDetail = () => {
                         <p className="text-muted">{product.description}</p>
 
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h3 className="text-primary">{product.price}</h3>
+                            <h3 className="text-primary">€{product.price.toLocaleString('en-US')}</h3>
                             <button
                                 className="btn btn-success add-to-cart-btn"
                                 onClick={handleAddToCart}
@@ -118,25 +83,22 @@ const CatalogDetail = () => {
                             </button>
                         </div>
 
-                        <h5>Features:</h5>
+                        {/* Displaying available product details from your DB schema */}
+                        <h5>Details:</h5>
                         <ul className="list-unstyled">
-                            {product.features.map((feature, index) => (
-                                <li key={index}>
-                                    <i className="fas fa-check-circle text-success"></i> {feature}
-                                </li>
-                            ))}
+                            <li><strong>Brand:</strong> {product.brand}</li>
+                            <li><strong>Model:</strong> {product.model}</li>
+                            <li><strong>Year:</strong> {product.year}</li>
+                            <li><strong>Color:</strong> {product.color}</li>
+                            <li><strong>Mileage:</strong> {product.mileage ? `${product.mileage.toLocaleString()} km` : 'N/A'}</li>
+                            <li><strong>Transmission:</strong> {product.transmission}</li>
+                            <li><strong>Fuel Type:</strong> {product.fuel_type}</li>
                         </ul>
 
-                        <h5>Specifications:</h5>
-                        <ul className="list-unstyled">
-                            <li><strong>Engine:</strong> {product.specs.engine}</li>
-                            <li><strong>Horsepower:</strong> {product.specs.horsepower}</li>
-                            <li><strong>Torque:</strong> {product.specs.torque}</li>
-                            <li><strong>Transmission:</strong> {product.specs.transmission}</li>
-                            <li><strong>Fuel Economy:</strong> {product.specs.fuelEconomy}</li>
-                        </ul>
+                        {/* Removed Features and Specifications sections as they are not in your current DB schema/API response */}
+                        {/* If you want these, you'll need to add them to your database and API */}
 
-                        <Link className="btn btn-secondary" to="/catalog">
+                        <Link className="btn btn-secondary" to="/user/catalog">
                             Back To Products
                         </Link>
                     </div>

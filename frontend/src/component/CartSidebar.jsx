@@ -29,7 +29,7 @@ const CartSidebar = () => {
                         {cartItems.map(item => (
                             <div key={item.id} className="d-flex mb-3">
                                 <img
-                                    src={item.images[0]}
+                                    src={item.image_url}
                                     alt={item.name}
                                     className="img-thumbnail me-2"
                                     style={{ width: '60px', height: '60px', objectFit: 'cover' }}

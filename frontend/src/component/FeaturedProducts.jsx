@@ -30,11 +30,23 @@ const FeaturedProducts = () => {
     }, []);
 
     if (loading) {
-        return <p>Loading featured products...</p>;
+        return (
+            <section className="py-5 bg-light">
+                <div className="container">
+                    <p>Loading featured products...</p>
+                </div>
+            </section>
+        )
     }
 
     if (error) {
-        return <p>Error loading featured products: {error}</p>;
+        return (
+            <section className="py-5 bg-light">
+                <div className="container">
+                    <p>No products to show!</p>
+                </div>
+            </section>
+        )
     }
 
     return (
@@ -55,7 +67,7 @@ const FeaturedProducts = () => {
                                     <h5 className="card-title">{product.name}</h5>
                                     <p className="card-text text-muted">{product.description && product.description.substring(0, 50)}...</p>
                                     <p className="card-text"><strong>Price:</strong> €{product.price}</p>
-                                    <Link to={`/catalog/${product.id}`} className="btn btn-primary btn-sm">View Details</Link>
+                                    <Link to={`/user/catalog/${product.id}`} className="btn btn-primary btn-sm">View Details</Link>
                                 </div>
                             </div>
                         </div>

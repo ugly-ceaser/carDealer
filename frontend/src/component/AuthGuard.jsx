@@ -1,10 +1,12 @@
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Import useAuth hook
 
 const AuthGuard = ({ children }) => {
-    const token = localStorage.getItem('token');
+    const { isAuthenticated } = useAuth(); // Get isAuthenticated from context
 
-    if (!token) {
-        return <Navigate to="/" replace />;
+    if (!isAuthenticated) {
+        // If not authenticated, redirect to the login page
+        return <Navigate to="/" replace />; // Assuming '/login' is your login route
     }
 
     return children;

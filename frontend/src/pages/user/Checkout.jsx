@@ -1,33 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import { useCart } from '../../context/CartContext'; // Import useCart hook
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for React Router redirect
 
 const Checkout = () => {
-    const [cart, setCart] = useState([]);
-    const [total, setTotal] = useState(0);
-
-    useEffect(() => {
-        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-        setCart(storedCart);
-    }, []);
-
-    useEffect(() => {
-        const totalAmount = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
-        setTotal(totalAmount);
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
-
-    const removeFromCart = (index) => {
-        const newCart = [...cart];
-        newCart.splice(index, 1);
-        setCart(newCart);
-    };
+    // Consume cart state and functions from CartContext
+    const { cartItems, cartTotal, removeFromCart, clearCart } = useCart();
+    const navigate = useNavigate();
 
     const handleCheckout = (e) => {
         e.preventDefault();
-        if (cart.length > 0) {
-            alert(`Processing payment for ${cart.length} item(s)`);
-            localStorage.removeItem('cart');
-            setCart([]);
-            window.location.href = 'thankyou.html'; // redirect
+        if (cartItems.length > 0) {
+            // In a real application, you would send payment details and cartItems to your backend here.
+            alert(`Processing payment for ${cartItems.length} item(s) totaling €${cartTotal.toLocaleString()}`);
+
+            // After successful payment processing on the backend:
+            clearCart(); // Clear the cart using the context function
+            navigate('/thankyou'); // Use navigate for React Router redirection
+        } else {
+            alert('Your cart is empty. Please add items before checking out.');
         }
     };
 
@@ -43,23 +32,24 @@ const Checkout = () => {
                                 <h5>Order Summary</h5>
                             </div>
                             <div className="card-body">
-                                {cart.length > 0 ? (
+                                {cartItems.length > 0 ? (
                                     <>
                                         <ul className="list-group list-group-flush">
-                                            {cart.map((item, index) => (
+                                            {cartItems.map((item) => ( // No need for index if item.id is unique
                                                 <li
-                                                    key={index}
+                                                    key={item.id} // Use item.id as key for better performance and stability
                                                     className="list-group-item bg-secondary text-white d-flex justify-content-between align-items-center"
                                                 >
                                                     <div>
                                                         <strong>{item.name}</strong>
                                                         <br />
-                                                        <small>€{parseFloat(item.price).toLocaleString()}</small>
+                                                        <small>€{parseFloat(item.price).toLocaleString()} x {item.quantity}</small>
                                                     </div>
                                                     <div>
+                                                        <span className="me-3">€{(item.price * item.quantity).toLocaleString()}</span>
                                                         <button
                                                             className="btn btn-sm btn-danger"
-                                                            onClick={() => removeFromCart(index)}
+                                                            onClick={() => removeFromCart(item.id)} // Pass item.id
                                                         >
                                                             <i className="fas fa-trash-alt"></i>
                                                         </button>
@@ -70,7 +60,7 @@ const Checkout = () => {
                                         <hr />
                                         <p>
                                             <strong>Total:</strong>{' '}
-                                            <span className="fs-4">€{total.toLocaleString()}</span>
+                                            <span className="fs-4">€{cartTotal.toLocaleString()}</span>
                                         </p>
                                     </>
                                 ) : (
@@ -143,10 +133,10 @@ const Checkout = () => {
                                     <button
                                         type="submit"
                                         className="btn btn-primary w-100"
-                                        disabled={cart.length === 0}
+                                        disabled={cartItems.length === 0} // Use cartItems from context
                                     >
-                                        {cart.length > 0
-                                            ? `Pay €${total.toLocaleString()}`
+                                        {cartItems.length > 0 // Use cartItems from context
+                                            ? `Pay €${cartTotal.toLocaleString()}` // Use cartTotal from context
                                             : 'Pay'}
                                     </button>
                                 </form>

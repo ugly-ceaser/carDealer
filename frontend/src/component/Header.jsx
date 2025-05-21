@@ -1,33 +1,21 @@
-import { ShoppingCart } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react'; // No need for useState, useEffect here anymore for auth state
+import { ShoppingCart, Search } from 'lucide-react';
+import { Link } from 'react-router-dom'; // useNavigate is not needed directly in header for logout redirect
 import { useSearch } from '../context/SearchContext';
-import { Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext'; // Import useAuth hook
 
 export default function UserHeader() {
     const { setShowSearch } = useSearch();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userName, setUserName] = useState('');
-    const navigate = useNavigate();
+    const { setShowCart } = useCart();
+    const { isAuthenticated, user, logout } = useAuth(); // Get auth state and functions from context
 
-    useEffect(() => {
-        // Check for the presence of a token in localStorage on component mount
-        const token = localStorage.getItem('token');
-        if (token) {
-            setIsAuthenticated(true);
-            const decodedToken = JSON.parse(atob(token.split('.')[1])); // Basic decode - BE CAREFUL WITH SENSITIVE DATA
-            setUserName(decodedToken?.name || 'User'); // Adjust based on your token structure
-        } else {
-            setIsAuthenticated(false);
-            setUserName('');
-        }
-    }, []);
+    // userName will now come from the 'user' object in context
+    const userName = user?.name || 'User'; // Default to 'User' if name isn't available
 
+    // handleLogout now directly calls the logout function from AuthContext
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-        setUserName('');
-        navigate('/login'); // Redirect to the login page after logout
+        logout(); // AuthContext's logout handles clearing token and redirection
     };
 
     return (
@@ -53,7 +41,7 @@ export default function UserHeader() {
                     <ul className="navbar-nav">
                         {isAuthenticated && (
                             <li className="nav-item">
-                                <Link to="/user/cart" className="nav-link" aria-current="page">
+                                <Link to="#" onClick={() => setShowCart(true)} className="nav-link" aria-current="page">
                                     <ShoppingCart />
                                 </Link>
                             </li>
@@ -61,7 +49,7 @@ export default function UserHeader() {
                         {isAuthenticated ? (
                             <>
                                 <li className="nav-item">
-                                    <Link to="/user/profile" className="nav-link">Hello, {userName}</Link>
+                                    <Link to="#" className="nav-link">Hello, {userName}</Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to="/user/profile" className="nav-link" aria-current="page">Profile</Link>
@@ -76,7 +64,7 @@ export default function UserHeader() {
                         ) : (
                             <>
                                 <li className="nav-item">
-                                    <Link to="/#login" className="nav-link">Login</Link>
+                                    <Link to="/" className="nav-link">Login</Link> {/* Changed from /#login to /login */}
                                 </li>
                                 <li className="nav-item">
                                     <Link to="/register" className="nav-link">Register</Link>
