@@ -32,20 +32,16 @@ export default function UserHeader() {
                         <li className="nav-item">
                             <Link to="/" className="nav-link active" aria-current="page">Home</Link>
                         </li>
-                        {isAuthenticated && (
-                            <li className="nav-item">
-                                <Link to="/user/catalog" className="nav-link active" aria-current="page">Catalog</Link>
-                            </li>
-                        )}
+                        <li className="nav-item">
+                            <Link to="/catalog" className="nav-link active" aria-current="page">Catalog</Link>
+                        </li>
                     </ul>
                     <ul className="navbar-nav">
-                        {isAuthenticated && (
-                            <li className="nav-item">
-                                <Link to="#" onClick={() => setShowCart(true)} className="nav-link" aria-current="page">
-                                    <ShoppingCart />
-                                </Link>
-                            </li>
-                        )}
+                        <li className="nav-item">
+                            <Link to="#" onClick={() => setShowCart(true)} className="nav-link" aria-current="page">
+                                <ShoppingCart />
+                            </Link>
+                        </li>
                         {isAuthenticated ? (
                             <>
                                 <li className="nav-item">

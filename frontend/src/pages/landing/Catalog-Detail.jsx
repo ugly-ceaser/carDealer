@@ -6,9 +6,8 @@ import { useAuth } from '../../context/AuthContext'; // Import useAuth for logou
 
 const CatalogDetail = () => {
     const { id } = useParams();
-    const [product, setProduct] = useState(null); // Initialize product state as null
-    const [activeIndex, setActiveIndex] = useState(0); // For carousel
-    const { addToCart } = useCart();
+    const [product, setProduct] = useState(null);
+    const { addToCart, cartItems } = useCart();
     const { logout } = useAuth(); // Get logout from AuthContext
 
     useEffect(() => {
@@ -36,9 +35,7 @@ const CatalogDetail = () => {
             addToCart({
                 id: product.id,
                 name: product.name,
-                price: product.price, // Use actual numeric price from fetched product
-                // Assuming image_url is a single string from the backend
-                // If you want multiple images, your backend/DB schema needs to support it
+                price: product.price,
                 image_url: product.image_url
             });
             alert(`${product.name} added to cart!`);
@@ -98,7 +95,7 @@ const CatalogDetail = () => {
                         {/* Removed Features and Specifications sections as they are not in your current DB schema/API response */}
                         {/* If you want these, you'll need to add them to your database and API */}
 
-                        <Link className="btn btn-secondary" to="/user/catalog">
+                        <Link className="btn btn-secondary" to="/catalog">
                             Back To Products
                         </Link>
                     </div>

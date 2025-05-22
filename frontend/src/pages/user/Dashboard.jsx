@@ -10,7 +10,7 @@ const DashboardPage = () => {
         <div className="container text-white">
           <h1 className="display-3 fw-bold mb-4">Welcome to Benz-World</h1>
           <p className="lead mb-5">Discover our exclusive collection of luxury vehicles</p>
-          <Link to="/user/catalog" className="btn btn-primary btn-lg">
+          <Link to="/catalog" className="btn btn-primary btn-lg">
             Browse Cars
           </Link>
         </div>
@@ -66,7 +66,7 @@ const DashboardPage = () => {
             {/* You can map featured car components here */}
           </div>
           <div className="text-center mt-5">
-            <Link to="/user/catalog" className="btn btn-primary btn-lg">
+            <Link to="/catalog" className="btn btn-primary btn-lg">
               View All Models
             </Link>
           </div>

@@ -2,19 +2,15 @@ import { useCart } from '../../context/CartContext'; // Import useCart hook
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for React Router redirect
 
 const Checkout = () => {
-    // Consume cart state and functions from CartContext
     const { cartItems, cartTotal, removeFromCart, clearCart } = useCart();
     const navigate = useNavigate();
 
     const handleCheckout = (e) => {
         e.preventDefault();
         if (cartItems.length > 0) {
-            // In a real application, you would send payment details and cartItems to your backend here.
             alert(`Processing payment for ${cartItems.length} item(s) totaling €${cartTotal.toLocaleString()}`);
 
-            // After successful payment processing on the backend:
-            clearCart(); // Clear the cart using the context function
-            navigate('/thankyou'); // Use navigate for React Router redirection
+            navigate('/user/thankyou');
         } else {
             alert('Your cart is empty. Please add items before checking out.');
         }

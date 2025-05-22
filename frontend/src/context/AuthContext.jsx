@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         setToken(null); // Clear token state
         setUser(null); // Clear user data state
-        navigate('/login'); // Redirect to the login page after logout
+        navigate('/'); // Redirect to the login page after logout
     }, [navigate]); // navigate is a stable reference, but good practice to include
 
     // Function to refresh user data from the backend

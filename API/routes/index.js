@@ -29,12 +29,9 @@ router.put('/user', authorize, updateUserProfile);
 router.put('/user/change-password', authorize, changePassword);
 
 //product routes
-router.post('/product', authorize, isAdmin, uploadImage, addProduct);
-router.get('/product', authorize, fetchAllProducts);
-router.put('/product/:id', authorize, isAdmin, uploadImage, updateProduct);
-router.get('/product/:id', authorize, fetchProductById);
-router.delete('/product/:id', authorize, isAdmin, deleteProduct);
-router.get('/product/search', authorize, searchProducts);
-router.get('/product/featured', authorize, fetchFeaturedProducts);
+router.get('/product', fetchAllProducts);
+router.get('/product/:id', fetchProductById);
+router.get('/product/search', searchProducts);
+router.get('/product/featured', fetchFeaturedProducts);
 
 module.exports = router;

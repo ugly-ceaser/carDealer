@@ -67,7 +67,7 @@ const FeaturedProducts = () => {
                                     <h5 className="card-title">{product.name}</h5>
                                     <p className="card-text text-muted">{product.description && product.description.substring(0, 50)}...</p>
                                     <p className="card-text"><strong>Price:</strong> €{product.price}</p>
-                                    <Link to={`/user/catalog/${product.id}`} className="btn btn-primary btn-sm">View Details</Link>
+                                    <Link to={`/catalog/${product.id}`} className="btn btn-primary btn-sm">View Details</Link>
                                 </div>
                             </div>
                         </div>

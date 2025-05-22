@@ -3,6 +3,7 @@ import { useSearch } from '../../context/SearchContext';
 import defaultProductImage from '../../assets/images/products/1.jpg';
 import { Link } from 'react-router-dom';
 import productsApi from '../../api/productApi';
+import { useCart } from '../../context/CartContext';
 
 const Catalog = () => {
     const { showSearch, setShowSearch } = useSearch();
@@ -18,6 +19,8 @@ const Catalog = () => {
     const [color, setColor] = useState('');
     const [transmission, setTransmission] = useState('');
     const [fuel_type, setFuelType] = useState('');
+    const { addToCart } = useCart(); // <--- GET addToCart function
+
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -249,7 +252,7 @@ const Catalog = () => {
                                         </ul>
                                         <div className="d-flex justify-content-between align-items-center">
                                             <Link to={`${product.id}`} className="btn btn-primary">View Details</Link>
-                                            <button className="btn btn-success">Add to Cart</button>
+                                            <button className="btn btn-success" onClick={() => addToCart(product)}>Add to Cart</button>
                                         </div>
                                     </div>
                                 </div>
